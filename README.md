@@ -3,7 +3,7 @@
 ## WordPress – Hệ quản trị nội dung (CMS) "mì ăn liền" vĩ đại nhất thế giới, chiếm tới hơn 40% website trên toàn cầu.
 ## Dự án này sẽ nhàn về mặt code, thiên về kỹ năng Quản trị hệ thống (SysAdmin) và thao tác giao diện.
 ---
-# BƯỚC 1: Dọn dẹp máy ảo và Chuẩn bị thư mục
+# Dọn dẹp máy ảo và Chuẩn bị thư mục
 
 Mở PowerShell (SSH vào Ubuntu) và gõ các lệnh sau để tắt dự án cũ (nếu có), giải phóng cổng mạng và RAM:
 
@@ -19,7 +19,7 @@ cd wordpress_project
 ```
 <img width="1400" height="257" alt="image" src="https://github.com/user-attachments/assets/7a5e67a5-424e-4fcc-ad8f-c8e43a162178" />
 
-# BƯỚC 2: Viết file docker-compose.yml
+# Viết file docker-compose.yml
 
 Tạo file cấu hình bằng lệnh:
 
@@ -118,3 +118,112 @@ Quay lại tab WordPress (`http://192.168.227.128:8001`).
 Nhấn phím `F5` (hoặc nút Tải lại trang).
 <img width="1919" height="1027" alt="Screenshot 2026-05-11 213126" src="https://github.com/user-attachments/assets/c4cccb52-c2fe-456d-82a0-649c752b3266" />
 Màn hình chọn ngôn ngữ của WordPress sẽ hiện ra thay vì cái dòng lỗi kia!
+
+## Cài đặt WordPress (Mì ăn liền)
+
+Sau khi `F5`, làm theo các bước nó hướng dẫn:
+
+- Chọn ngôn ngữ: `Tiếng Việt` (cho dễ dùng).
+
+- Tiêu đề trang: `Website của ...`.
+
+- Tên người dùng: (Đặt gì cũng được, ví dụ `admin`).
+
+- Mật khẩu: (đặt mật khẩu dễ nhớ, hoặc copy cái nó gợi ý).
+
+- Email: Điền email.
+
+- Bấm `Cài đặt WordPress`.
+<img width="1919" height="1020" alt="Screenshot 2026-05-11 213357" src="https://github.com/user-attachments/assets/b2e149e5-6fe8-466a-abd6-b863dda409c7" />
+
+- Thành công tạo tài khoản WordPress
+<img width="1919" height="1023" alt="Screenshot 2026-05-11 213438" src="https://github.com/user-attachments/assets/1e462b25-7dc0-48ce-8d72-c20fcdffb765" />
+
+## Đăng nhập vào quản trị
+
+Bấm vào chữ `Đăng nhập` trên màn hình đó (hoặc vào link `http://192.168.227.128:8001/wp-admin`). Nhập `Username` (`admin`) và mật khẩu vừa đặt ở bước trước.
+<img width="1919" height="1023" alt="Screenshot 2026-05-11 213556" src="https://github.com/user-attachments/assets/7b893bc5-aaab-48e1-88d4-4044c4428420" />
+
+---
+
+## Viết 2 bài báo theo yêu cầu
+
+Trong giao diện quản trị (`Dashboard`), nhìn cột bên trái, chọn `Bài viết (Posts)` -> `Viết bài mới (Add New)`. 
+<img width="1919" height="1015" alt="Screenshot 2026-05-11 213757" src="https://github.com/user-attachments/assets/6952ce8b-46ee-4c54-806d-40344fd269aa" />
+
+Viết 2 bài viết giới thiệu bản thân và giới thiệu ngành học yêu thích (có thể chèn ảnh, video, âm thanh).
+<img width="1919" height="1020" alt="Screenshot 2026-05-11 215605" src="https://github.com/user-attachments/assets/5f923bc7-29dd-442d-8d0c-ae6aa9bc37b5" />
+<img width="1919" height="1025" alt="Screenshot 2026-05-11 221351" src="https://github.com/user-attachments/assets/e8e555dc-1201-44b6-86a4-ee9cf88acf8a" />
+
+# Cuối cùng, để mở online (public) website từ máy ảo Ubuntu ra Internet bằng Cloudflare Tunnel, thực hiện một chuỗi các lệnh theo trình tự "đào hầm" như sau:
+
+## 1. Lệnh tạo đường hầm (Khởi tạo)
+
+Đây là lệnh để đăng ký một đường hầm mới với server của Cloudflare.
+
+```bash
+cloudflared tunnel create wordpress_tunnel
+```
+<img width="1914" height="224" alt="Screenshot 2026-05-11 221748" src="https://github.com/user-attachments/assets/27e9a2d1-50e8-44c4-bba8-24a492ead319" />
+
+Mục đích: Tạo ra một định danh (ID) duy nhất cho đường hầm trên hệ thống Cloudflare.
+
+---
+
+## 2. Lệnh gắn tên miền (Trỏ DNS)
+
+Lệnh này giúp kết nối cái sub-domain muốn (`wp.sunning.id.vn`) với cái đường hầm vừa tạo.
+
+```bash
+cloudflared tunnel route dns wordpress_tunnel wp.sunning.id.vn
+```
+<img width="1919" height="156" alt="Screenshot 2026-05-11 221809" src="https://github.com/user-attachments/assets/3856816a-4810-43da-94fe-de9a749ae9f3" />
+
+Mục đích: Để khi bất kỳ ai gõ `wp.sunning.id.vn` trên trình duyệt, Cloudflare sẽ biết đường dẫn tín hiệu vào cái hầm `wordpress_tunnel` đang nằm trong máy ảo.
+
+---
+
+## 3. Lệnh chạy đường hầm (Kích hoạt online)
+
+Đây là lệnh quan trọng nhất, dùng để "thông" tín hiệu từ máy ảo ra ngoài.Sử dụng 2 phiên bản của lệnh này:
+
+### Phiên bản cơ bản (Lúc đầu):
+
+```bash
+cloudflared tunnel run --url http://localhost:8001 wordpress_tunnel
+```
+<img width="1919" height="894" alt="Screenshot 2026-05-11 221848" src="https://github.com/user-attachments/assets/cf158f3b-87d3-4293-b01d-2844eff276d4" />
+
+Mục đích: Mở cổng hầm, đón khách từ internet vào và đẩy vào cổng `8001` (nơi WordPress đang chạy).
+
+### Phiên bản nâng cao (Để sửa lỗi Redirect/HTTPS nãy giờ):
+
+```bash
+cloudflared tunnel run --url http://localhost:8001 --http-header "X-Forwarded-Proto:https" wordpress_tunnel
+```
+
+Mục đích: Giống lệnh trên nhưng thêm cái `"nhãn"` HTTPS để báo cho WordPress biết là khách đang vào bằng kết nối bảo mật, tránh lỗi quay vòng mòng.
+
+---
+
+## 4. Các lệnh hỗ trợ xử lý lỗi "Online"
+
+Trong quá trình làm, do WordPress `"cứng đầu"` không chịu nhận tên miền mới,Phải dùng thêm lệnh này để ép nó chạy online chuẩn:
+
+```bash
+docker compose exec wordpress sed -i "3i define('WP_HOME', 'https://wp.sunning.id.vn'); define('WP_SITEURL', 'https://wp.sunning.id.vn');" wp-config.php
+```
+
+Mục đích: Ép WordPress phải lấy tên miền online làm địa chỉ gốc, không được tự ý nhảy về IP nội bộ hay chèn thêm cổng `:8001`.
+
+---
+
+## Lưu ý:
+
+Để web luôn online, phải giữ nguyên cái tab PowerShell đang chạy lệnh `cloudflared tunnel run`. Nếu tắt tab đó hoặc nhấn `Ctrl + C`, cái hầm sẽ bị sập và web sẽ báo lỗi `"Không thể truy cập trang web này"` ngay lập tức!
+
+# KẾT QUẢ
+<p align="center">
+  <img width="49%" alt="Screenshot 2026-05-11 223436" src="https://github.com/user-attachments/assets/f718206b-3e08-4370-8066-1507737fdb02" />
+  <img width="49%" alt="Screenshot 2026-05-11 223459" src="https://github.com/user-attachments/assets/2ac2a832-2de3-4d1c-892a-c99de46aca47" />
+</p>
