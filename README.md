@@ -227,3 +227,28 @@ Mục đích: Ép WordPress phải lấy tên miền online làm địa chỉ g�
   <img width="49%" alt="Screenshot 2026-05-11 223436" src="https://github.com/user-attachments/assets/f718206b-3e08-4370-8066-1507737fdb02" />
   <img width="49%" alt="Screenshot 2026-05-11 223459" src="https://github.com/user-attachments/assets/2ac2a832-2de3-4d1c-892a-c99de46aca47" />
 </p>
+
+# NHẬN XÉT THỰC TẾ VIỆC TRIỂN KHAI WORDPRESS QUA DOCKER
+
+## 1. Về công sức triển khai:
+
+- Tốn nhiều công sức cấu hình: Không tốn sức viết code nhưng cực kỳ vất vả ở khâu xử lý lỗi hệ thống (Troubleshooting). Phải giải quyết các lỗi mạng khi tải Image (Timeout), máy ảo đổi IP đột ngột và lỗi vòng lặp chuyển hướng (Redirect Loop) khi chạy Cloudflare Tunnel.
+
+- Xử lý thủ công: Phải dùng lệnh `sed` can thiệp trực tiếp vào file cấu hình `wp-config.php` để ép tên miền chuẩn và xử lý lỗi hiển thị Media (`Mixed Content`).
+
+## 2. Độ dễ và khó sử dụng:
+
+- Khó (Kỹ thuật): Đòi hỏi kiến thức vững về Linux, Docker và Network để cấu hình Container và DNS. Việc sửa lỗi rất phức tạp vì file nằm sâu trong bộ nhớ Container.
+
+- Dễ (Nội dung): Khi hệ thống đã chạy, việc quản trị bài viết rất nhàn. Giao diện kéo thả cho phép chèn ảnh, âm thanh, video giới thiệu ngành KTMT – TNUT cực nhanh mà không cần code.
+
+## 3. Tiêu tốn tài nguyên máy chủ:
+
+- Ổ cứng: Rất tốn kém; bộ Image Docker và dữ liệu Media chiếm tới `7.2GB / 10GB` (hơn `70%`) dung lượng máy ảo ngay khi vừa cài xong.
+
+- RAM/CPU: WordPress và MariaDB ngốn tài nguyên lớn để duy trì các tiến trình PHP và truy vấn Database, gây tải nặng khi thực hiện upload file media.
+<img width="922" height="187" alt="image" src="https://github.com/user-attachments/assets/8193048d-5e54-429d-baab-b23091c2479f" />
+
+## => Kết luận:
+
+WordPress + Docker giúp tạo web nhanh, chuyên nghiệp nhưng yêu cầu kỹ năng Quản trị hệ thống (`SysAdmin`) tốt để vận hành và xử lý các xung đột phát sinh.
